@@ -26,8 +26,6 @@
     {
       "resources": ["injected.js"],
       "matches": [
-        "http://localhost:*/*",
-        "http://127.0.0.1:*/*",
         "https://*.ngrok.io/*",
         "https://*.ngrok-free.app/*",
         "https://*.loca.lt/*",
@@ -38,8 +36,6 @@
   "content_scripts": [
     {
       "matches": [
-        "http://localhost:*/*",
-        "http://127.0.0.1:*/*",
         "https://*.ngrok.io/*",
         "https://*.ngrok-free.app/*",
         "https://*.loca.lt/*",
