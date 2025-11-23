@@ -73,6 +73,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'getStatus') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const activeTab = tabs[0];
+      console.log('[Background] Status request - activeTab:', activeTab);
       sendResponse({
         nativeConnected: isConnected,
         mcpConnected: null, // We don't track MCP connection separately yet
