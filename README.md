@@ -1,8 +1,8 @@
-# AI Live Terminal Bridge - Browser Monitor (Chrome Web Store Version)
+# AI Live Terminal Bridge - Browser Monitor
 
-**This is the Chrome Web Store compliant version** of the AI Live Terminal Bridge browser extension.
+**Privacy-focused browser monitoring for localhost development**
 
-This Chrome extension captures browser console logs and network activity from localhost pages and streams them to the AI Live Log Bridge MCP server.
+This Chrome extension captures console logs and network activity from your localhost pages, designed to work with the [AI Live Log Bridge](https://github.com/Ami3466/ai-live-log-bridge) MCP server for seamless AI debugging.
 
 ## Features
 
@@ -10,123 +10,136 @@ This Chrome extension captures browser console logs and network activity from lo
 - ✅ Monitors network requests (fetch, XMLHttpRequest)
 - ✅ Captures JavaScript errors and stack traces
 - ✅ Tracks performance metrics
-- ✅ **Localhost only** - Only monitors localhost:* and 127.0.0.1:* for security
-- ✅ **No UI** - Runs silently in the background
-- ✅ **Automatic secret redaction** - Cookies, tokens, and API keys are redacted before reaching the AI
+- ✅ **Privacy-focused**: Only monitors localhost:* and 127.0.0.1:* pages
+- ✅ **No external connections**: All data stays on your machine
+- ✅ **Automatic secret redaction**: Cookies, tokens, and API keys are automatically redacted
+- ✅ **Status popup**: See connection status at a glance
 
 ## Installation
 
-### Step 1: Build the Main Project
+### From Chrome Web Store (Recommended)
 
-```bash
-cd /path/to/ai-live-log-bridge
-npm install
-npm run build
-```
+1. Visit the [Chrome Web Store listing](#) (link coming soon)
+2. Click "Add to Chrome"
+3. Grant the requested permissions
+4. Done! The extension will start monitoring localhost pages automatically
 
-### Step 2: Install Native Messaging Host
+### For Developers (Load Unpacked)
 
-```bash
-npm run install-native-host
-```
+1. Clone or download this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" (toggle in top right)
+4. Click "Load unpacked"
+5. Select this directory
+6. The extension will appear in your extensions list
 
-### Step 3: Load the Extension in Chrome
+## How It Works
 
-1. Open Chrome and navigate to: `chrome://extensions/`
-2. Enable **Developer mode** (toggle in top right corner)
-3. Click **Load unpacked**
-4. Select the `extension` folder from your project directory
-5. The extension should now appear in your extensions list
+### Standalone Mode (Default)
 
-### Step 4: Update Native Host Manifest (Important!)
+The extension works immediately after installation:
 
-After loading the extension:
+1. Open any localhost page (e.g., `http://localhost:3000`)
+2. The extension automatically captures console logs and network activity
+3. Logs appear in your browser's DevTools Console (F12)
+4. Click the extension icon to see monitoring status
 
-1. Copy the **Extension ID** from `chrome://extensions/` (it looks like: `abcdefghijklmnopqrstuvwxyz123456`)
-2. Open the native messaging host manifest file:
-   - **macOS**: `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.ai_live_log_bridge.browser_monitor.json`
-   - **Linux**: `~/.config/google-chrome/NativeMessagingHosts/com.ai_live_log_bridge.browser_monitor.json`
-3. Replace `YOUR_EXTENSION_ID` with your actual extension ID in the `allowed_origins` field
+### Full Integration Mode (Advanced)
 
-Example:
-```json
-{
-  "name": "com.ai_live_log_bridge.browser_monitor",
-  "description": "AI Live Log Bridge - Browser Monitoring Host",
-  "path": "/path/to/project/dist/browser/native-host.js",
-  "type": "stdio",
-  "allowed_origins": [
-    "chrome-extension://abcdefghijklmnopqrstuvwxyz123456/"
-  ]
-}
-```
+For AI debugging with the MCP server:
 
-## Usage
+1. Install the complete system: `npm install -g ai-live-log-bridge`
+2. Follow the [setup guide](https://github.com/Ami3466/ai-live-log-bridge)
+3. The extension will connect to the native host automatically
+4. AI can now read your browser logs directly
 
-Once installed, the extension automatically:
+## Status Popup
 
-1. Monitors all localhost pages you visit
-2. Captures console logs, network requests, and errors
-3. Sends them to the native messaging host
-4. MCP server stores them in `~/.mcp-logs/browser/`
-5. AI can read them using the `view_browser_logs` MCP tool
+Click the extension icon to see:
 
-## Testing
+- **Native Host** - Connection status (optional, for MCP integration)
+- **MCP Server** - Whether the server is running (optional)
+- **Monitoring** - Whether the current tab is being monitored
 
-1. Run a development server:
-   ```bash
-   ai npm run dev
-   ```
+The popup auto-refreshes every 3 seconds.
 
-2. Open `http://localhost:3000` (or your dev server port) in Chrome
+## Privacy & Security
 
-3. Open DevTools (F12) and run:
-   ```javascript
-   console.log('Test message');
-   console.error('Test error');
-   fetch('/api/test');
-   ```
+- **Localhost only**: Only monitors `localhost:*` and `127.0.0.1:*` by default
+- **No tracking**: We don't collect any usage data or analytics
+- **No external connections**: All data stays on your local machine
+- **Automatic secret redaction**: Sensitive data is redacted before logging
+- **Open source**: Full source code available on GitHub
 
-4. Check that logs are being captured:
-   ```bash
-   cat ~/.mcp-logs/browser/active/browser-*.log
-   ```
+## Optional Permissions
+
+The extension requests optional permissions for tunneling services:
+- `https://*.ngrok.io/*` - Ngrok tunnels
+- `https://*.ngrok-free.app/*` - Ngrok free tier
+- `https://*.loca.lt/*` - Localtunnel
+- `https://*.trycloudflare.com/*` - Cloudflare Tunnel
+
+These are **optional** and only needed if you want to monitor tunneled localhost connections.
+
+## Permissions Explained
+
+- **nativeMessaging**: Enables optional connection to the MCP server via native host
+- **tabs**: Required to identify which tab logs are coming from
+- **activeTab**: Required to show current tab status in the popup
 
 ## Troubleshooting
 
-### Extension shows "Disconnected"
+### "Native Host Disconnected" in popup
 
-- Make sure the native messaging host is installed: `npm run install-native-host`
-- Check that the extension ID in the manifest matches your actual extension ID
-- Refresh the page
+This is **normal** for most users! The native host is optional and only needed for full MCP integration.
+
+To enable (optional):
+1. Install: `npm install -g ai-live-log-bridge`
+2. Follow the [setup guide](https://github.com/Ami3466/ai-live-log-bridge)
 
 ### No logs appearing
 
-- Make sure you're on a **localhost** page (not https://, not a regular website)
-- Check the extension is enabled in `chrome://extensions/`
-- Look for errors in the extension's service worker console (click "Inspect views" in `chrome://extensions/`)
+- Ensure you're on a **localhost** page (not a regular website)
+- Check the extension is enabled at `chrome://extensions/`
+- Open DevTools (F12) to see captured logs in the Console
 
-### Native messaging host not found
+### How to view logs
 
-- Verify the path in the manifest file points to the correct location
-- Make sure you ran `npm run build` before installing the native host
-- Check the manifest file exists in the correct directory
+Logs are visible in:
+1. Browser DevTools Console (F12) - always available
+2. Extension service worker console (`chrome://extensions/` → Service Worker)
+3. MCP server (if native host is installed)
 
-## Security
+## Development
 
-- **Localhost only**: Only monitors localhost:* and 127.0.0.1:* pages
-- **No cross-domain**: Cannot access data from other websites
-- **Automatic redaction**: Cookies, tokens, and API keys are redacted before logging
-- **No external connections**: All data stays on your machine
+### Project Structure
 
-## Uninstallation
+```
+.
+├── manifest.json       # Extension manifest (Manifest V3)
+├── background.js       # Background service worker
+├── content.js          # Content script (message relay)
+├── injected.js         # Page context script (captures logs)
+├── popup.html          # Status popup UI
+├── popup.js            # Popup logic
+├── icon*.png           # Extension icons
+└── README.md           # This file
+```
 
-1. Remove the extension from `chrome://extensions/`
-2. Remove the extension from Chrome's extensions list
-3. Remove the native messaging host manifest (optional):
-   - **macOS**: `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.ai_live_log_bridge.browser_monitor.json`
-   - **Linux**: `~/.config/google-chrome/NativeMessagingHosts/com.ai_live_log_bridge.browser_monitor.json`
+### No Build Required
+
+This extension uses vanilla JavaScript - no build step needed!
+
+## Links
+
+- **Main Project**: [AI Live Log Bridge](https://github.com/Ami3466/ai-live-log-bridge)
+- **Report Issues**: [GitHub Issues](https://github.com/Ami3466/ai-live-log-bridge-extension/issues)
+- **Privacy Policy**: [PRIVACY_POLICY.md](PRIVACY_POLICY.md)
 
 ## License
 
-MIT
+MIT License - See [LICENSE](LICENSE) file for details
+
+---
+
+**Made for developers who want AI to see what they see** 🤖👀

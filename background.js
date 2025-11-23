@@ -66,10 +66,26 @@ function sendToNativeHost(message) {
 }
 
 /**
- * Handle messages from content scripts
+ * Handle messages from content scripts and popup
  */
-chrome.runtime.onMessage.addListener((message, sender) => {
-  // Add sender tab information
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // Handle status request from popup
+  if (message.type === 'getStatus') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const activeTab = tabs[0];
+      sendResponse({
+        nativeConnected: isConnected,
+        mcpConnected: null, // We don't track MCP connection separately yet
+        activeTab: activeTab ? {
+          url: activeTab.url,
+          title: activeTab.title
+        } : null
+      });
+    });
+    return true; // Will respond asynchronously
+  }
+
+  // Forward browser logs to native host
   const enrichedMessage = {
     ...message,
     tabId: sender.tab?.id,
@@ -77,10 +93,9 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     frameId: sender.frameId
   };
 
-  // Forward to native host
   sendToNativeHost(enrichedMessage);
 
-  // No response needed
+  // No response needed for log messages
   return false;
 });
 
