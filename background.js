@@ -127,3 +127,32 @@ setInterval(() => {
     sendToNativeHost({ type: 'heartbeat', timestamp: Date.now() });
   }
 }, 30000); // Every 30 seconds
+
+/**
+ * Inject content scripts dynamically when user visits localhost or tunnel pages
+ */
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // Only inject when page finishes loading
+  if (changeInfo.status !== 'complete') return;
+
+  const url = tab.url || '';
+
+  // Check if URL is localhost or a supported tunnel
+  const isLocalhost = url.startsWith('http://localhost:') || url.startsWith('http://127.0.0.1:');
+  const isTunnel =
+    url.includes('.ngrok.io') ||
+    url.includes('.ngrok-free.app') ||
+    url.includes('.loca.lt') ||
+    url.includes('.trycloudflare.com');
+
+  if (isLocalhost || isTunnel) {
+    console.log('[Background] Injecting content script into:', url);
+
+    chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['content.js']
+    }).catch(err => {
+      console.error('[Background] Failed to inject content script:', err);
+    });
+  }
+});
