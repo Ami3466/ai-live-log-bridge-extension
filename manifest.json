@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Live Terminal Bridge - Browser Monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Captures console logs & network activity from localhost for AI debugging. Privacy-focused, local-only monitoring.",
   "permissions": [
     "nativeMessaging",
@@ -33,5 +33,11 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": ["http://localhost:*/*", "http://127.0.0.1:*/*", "https://*.ngrok.io/*", "https://*.ngrok-free.app/*", "https://*.loca.lt/*", "https://*.trycloudflare.com/*"]
+    }
+  ],
   "homepage_url": "https://github.com/Ami3466/ai-live-log-bridge"
 }
